@@ -1,22 +1,20 @@
 import { data } from "../data";
 import NavBar from "./Navbar";
 import MovieCard from "./Moviecard";
-import { useEffect, useReducer } from "react";
+import { useEffect } from "react";
 import { addMovies, showFavourites } from "../actions";
+import { connect } from "react-redux";
 
 function App(props) {
-  //forceupdate is not recomended as testing purpose only we are using it
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
-  useEffect(() => {
-    props.store.subscribe(() => {
-      forceUpdate();
-    });
+  //console.log(props.movies);
 
-    props.store.dispatch(addMovies(data));
-  }, [props.store]);
+  const { dispatch } = props;
+  useEffect(() => {
+    dispatch(addMovies(data));
+  }, [dispatch]);
 
   const isMovieFavourite = (movie) => {
-    const { movies } = props.store.getState();
+    const { movies } = props;
     const favMovie = movies.favMovie;
     const index = favMovie.indexOf(movie);
     if (index !== -1) {
@@ -26,22 +24,21 @@ function App(props) {
   };
 
   const movieIndex = (movie) => {
-    const { movies } = props.store.getState();
-    const favMovie = movies.favMovie;
-    const index = favMovie.indexOf(movie);
+    const { movies } = props;
+    const index = movies.favMovie.indexOf(movie);
     return index;
   };
   const onChangeTab = (val) => {
-    props.store.dispatch(showFavourites(val));
+    props.dispatch(showFavourites(val));
   };
 
-  const { movies, search } = props.store.getState();
-  const { movieList, favMovie, showFavouriteMovie } = movies;
+  //const { movies } = props.movies;
+  const { movieList, favMovie, showFavouriteMovie } = props.movies;
   const displayMovies = showFavouriteMovie ? favMovie : movieList;
   // console.log(displayMovies);
   return (
     <div className="App">
-      <NavBar dispatch={props.store.dispatch} search={search} />
+      <NavBar />
       <div className="main">
         <div className="tabs">
           <div
@@ -64,7 +61,7 @@ function App(props) {
               <MovieCard
                 movie={movie}
                 key={index}
-                dispatch={props.store.dispatch}
+                dispatch={props.dispatch}
                 isFavourite={isMovieFavourite(movie)}
                 indexOfMovie={movieIndex(movie)}
               />
@@ -78,4 +75,19 @@ function App(props) {
   );
 }
 
-export default App;
+// function AppWrapper() {
+//   return (
+//     <StoreContext.Consumer>
+//       {(store) => <App props={store} />}
+//     </StoreContext.Consumer>
+//   );
+// }
+
+function mapStateToProps(state) {
+  return {
+    movies: state.movies,
+    search: state.movies,
+  };
+}
+
+export default connect(mapStateToProps)(App);

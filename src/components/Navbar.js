@@ -1,8 +1,9 @@
+import { Connect, connect } from "react-redux";
 import { addMovieToList, handleMovieSearch } from "../actions";
 import { useState } from "react";
 
 function NavBar({ dispatch, search }) {
-  console.log(search.result);
+  //console.log(search);
   const movie = search.result;
   //console.log(movie.Search.map((e) => e));
   const showSearchResult = search.showSearchResult;
@@ -42,4 +43,18 @@ function NavBar({ dispatch, search }) {
   );
 }
 
-export default NavBar;
+// function NavBarWrapper() {
+//   return (
+//     <StoreContext.Consumer>
+//       {(store) => (
+//         <NavBar dispatch={store.dispatch} search={store.getState().search} />
+//       )}
+//     </StoreContext.Consumer>
+//   );
+// }
+
+function mapStateToProps({ search }) {
+  return { search };
+}
+
+export default connect(mapStateToProps)(NavBar);
